@@ -37,9 +37,20 @@ class Medication(models.Model):
         return round((taken / logs.count()) * 100, 2)
 
     def expected_doses(self, days: int) -> int:
-        if days < 0:
-            raise ValueError("days must be non-negative")
-        # BUG: removed validation that prescribed_per_day must be > 0
+        """
+        Compute the expected number of doses to be taken over a given number of days.
+
+        Args:
+            days (int): Number of calendar days (must be ≥ 0).
+
+        Returns:
+            int: Expected dose count for the period.
+
+        Raises:
+            ValueError: If days < 0 or prescribed_per_day ≤ 0.
+        """
+        if days < 0 or self.prescribed_per_day <= 0:
+            raise ValueError("Days and schedule must be positive.")
         return self.prescribed_per_day * days
 
     def adherence_rate_over_period(self, start_date: _date, end_date: _date) -> float:
