@@ -52,16 +52,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "medtracker.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "medtracker_db"),
-        "USER": os.getenv("DB_USER", "Developer"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "test"),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
+if os.environ.get("GITHUB_ACTIONS") == "true":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME", "medtracker_db"),
+            "USER": os.getenv("DB_USER", "Developer"),
+            "PASSWORD": os.getenv("DB_PASSWORD", "test"),
+            "HOST": os.getenv("DB_HOST", "localhost"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
