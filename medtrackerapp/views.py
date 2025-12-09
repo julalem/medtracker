@@ -4,7 +4,9 @@ from rest_framework.response import Response
 from django.utils.dateparse import parse_date
 from .models import Medication, DoseLog
 from .serializers import MedicationSerializer, DoseLogSerializer
-
+from rest_framework.decorators import action
+from rest_framework import status
+from rest_framework.response import Response
 class MedicationViewSet(viewsets.ModelViewSet):
     """
     API endpoint for viewing and managing medications.
@@ -23,6 +25,32 @@ class MedicationViewSet(viewsets.ModelViewSet):
     """
     queryset = Medication.objects.all()
     serializer_class = MedicationSerializer
+
+    @action(detail=True, methods=["get"], url_path="expected-doses", url_name="expected-doses")
+    def expected_doses(self, request, pk=None):
+        med = self.get_object()
+        days_param = request.query_params.get("days", None)
+        if days_param is None or days_param == "":
+            return Response({"error": "days parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            days = int(days_param)
+        except (ValueError, TypeError):
+            return Response({"error": "days must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if days <= 0:
+            return Response({"error": "days must be a positive integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            expected = med.expected_doses(days)
+        except ValueError as exc:
+            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "medication_id": med.id,
+            "days": days,
+            "expected_doses": expected
+        }, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"], url_path="info")
     def get_external_info(self, request, pk=None):
