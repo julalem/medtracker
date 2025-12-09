@@ -28,29 +28,62 @@ class MedicationViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"], url_path="expected-doses", url_name="expected-doses")
     def expected_doses(self, request, pk=None):
-        med = self.get_object()
-        days_param = request.query_params.get("days", None)
-        if days_param is None or days_param == "":
-            return Response({"error": "days parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+        """
+        Calculate the expected number of medication doses for the specified
+        number of days.
+
+        Query params:
+            days (int): Number of days to calculate expected doses for.
+                        Must be a positive integer.
+
+        Returns:
+            200 OK:
+                {
+                    "medication_id": <int>,
+                    "days": <int>,
+                    "expected_doses": <int>
+                }
+
+            400 Bad Request:
+                {
+                    "error": "<message>"
+                }
+        """
+        medication = self.get_object()
+
+        days_param = request.query_params.get("days")
+        if not days_param:
+            return Response(
+                {"error": "Query parameter 'days' is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             days = int(days_param)
+            if days <= 0:
+                raise ValueError
         except (ValueError, TypeError):
-            return Response({"error": "days must be an integer"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if days <= 0:
-            return Response({"error": "days must be a positive integer"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "'days' must be a positive integer."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
-            expected = med.expected_doses(days)
+            expected_doses = medication.expected_doses(days)
         except ValueError as exc:
-            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": str(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        return Response({
-            "medication_id": med.id,
-            "days": days,
-            "expected_doses": expected
-        }, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "medication_id": medication.id,
+                "days": days,
+                "expected_doses": expected_doses,
+            },
+            status=status.HTTP_200_OK,
+        )
 
     @action(detail=True, methods=["get"], url_path="info")
     def get_external_info(self, request, pk=None):
