@@ -13,8 +13,9 @@ class Medication(models.Model):
     """
         
     name = models.CharField(max_length=100)
-    dosage_mg = models.PositiveIntegerField()
+    dosage_mg = models.PositiveIntegerField(default=0)
     prescribed_per_day = models.PositiveIntegerField(help_text="Expected number of doses per day")
+    description = models.TextField(blank=True)
 
     def __str__(self):
         """Return a human-readable representation of the medication."""
@@ -127,3 +128,9 @@ class DoseLog(models.Model):
         status = "Taken" if self.was_taken else "Missed"
         when = timezone.localtime(self.taken_at).strftime("%Y-%m-%d %H:%M")
         return f"{self.medication.name} at {when} - {status}"
+
+class Note(models.Model):
+        """Records the administration of a medication note."""
+        medication = models.ForeignKey(Medication, on_delete=models.CASCADE, related_name="notes")
+        text = models.TextField()
+        created_at = models.DateField(auto_now_add=True)

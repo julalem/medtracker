@@ -2,8 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils.dateparse import parse_date
-from .models import Medication, DoseLog
-from .serializers import MedicationSerializer, DoseLogSerializer
+from .models import Medication, DoseLog, Note
+from .serializers import MedicationSerializer, DoseLogSerializer, NoteSerializer
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
@@ -118,7 +118,7 @@ class DoseLogViewSet(viewsets.ModelViewSet):
     API endpoint for viewing and managing dose logs.
 
     A DoseLog represents an event where a medication dose was either
-    taken or missed. This viewset provides standard CRUD operations
+    taken or missed. This view set provides standard CRUD operations
     and a custom filtering action by date range.
 
     Endpoints:
@@ -166,3 +166,42 @@ class DoseLogViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(logs, many=True)
         return Response(serializer.data)
+
+class NoteViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing doctor's notes associated with medications.
+
+    This view set supports the following operations:
+
+    - list:
+        Retrieve a list of all notes stored in the system.
+    - retrieve:
+        Retrieve details of a single note by its ID.
+    - create:
+        Create a new note linked to a specific medication.
+    - destroy:
+        Delete an existing note.
+
+    Updating notes is *not supported* — both full updates (PUT)
+    and partial updates (PATCH) are disabled and will return HTTP 405.
+
+    Notes are linked to medications using a foreign key relationship.
+    Each note stores:
+    - the text content of the note,
+    - creation date,
+    - the referenced medication.
+
+    Endpoint base path:
+        /api/notes/
+    """
+    queryset = Note.objects.all()
+    serializer_class = NoteSerializer
+
+    def update(self, request, *args, **kwargs):
+        return Response({"detail": "Updating notes is not allowed."},
+                        status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response({"detail": "Updating notes is not allowed."},
+                        status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
