@@ -7,6 +7,7 @@ from .serializers import MedicationSerializer, DoseLogSerializer, NoteSerializer
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.filters import SearchFilter
 class MedicationViewSet(viewsets.ModelViewSet):
     """
     API endpoint for viewing and managing medications.
@@ -197,6 +198,9 @@ class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
 
+    filter_backends = [SearchFilter]
+    search_fields = ['medication__name']
+
     def update(self, request, *args, **kwargs):
         return Response({"detail": "Updating notes is not allowed."},
                         status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -204,4 +208,5 @@ class NoteViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return Response({"detail": "Updating notes is not allowed."},
                         status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
