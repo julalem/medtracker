@@ -4,10 +4,9 @@ from rest_framework.response import Response
 from django.utils.dateparse import parse_date
 from .models import Medication, DoseLog, Note
 from .serializers import MedicationSerializer, DoseLogSerializer, NoteSerializer
-from rest_framework.decorators import action
-from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
+
+
 class MedicationViewSet(viewsets.ModelViewSet):
     """
     API endpoint for viewing and managing medications.
@@ -24,10 +23,16 @@ class MedicationViewSet(viewsets.ModelViewSet):
         - DELETE /medications/{id}/ — delete a medication
         - GET /medications/{id}/info/ — fetch external drug info from OpenFDA
     """
+
     queryset = Medication.objects.all()
     serializer_class = MedicationSerializer
 
-    @action(detail=True, methods=["get"], url_path="expected-doses", url_name="expected-doses")
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="expected-doses",
+        url_name="expected-doses",
+    )
     def expected_doses(self, request, pk=None):
         """
         Calculate the expected number of medication doses for the specified
@@ -131,6 +136,7 @@ class DoseLogViewSet(viewsets.ModelViewSet):
         - GET /logs/filter/?start=YYYY-MM-DD&end=YYYY-MM-DD —
           filter logs within a date range
     """
+
     queryset = DoseLog.objects.all()
     serializer_class = DoseLogSerializer
 
@@ -156,17 +162,21 @@ class DoseLogViewSet(viewsets.ModelViewSet):
 
         if not start or not end:
             return Response(
-                {"error": "Both 'start' and 'end' query parameters are required and must be valid dates."},
-                status=status.HTTP_400_BAD_REQUEST
+                {
+                    "error": "Both 'start' and 'end' query parameters are required and must be valid dates."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        logs = self.get_queryset().filter(
-            taken_at__date__gte=start,
-            taken_at__date__lte=end
-        ).order_by("taken_at")
+        logs = (
+            self.get_queryset()
+            .filter(taken_at__date__gte=start, taken_at__date__lte=end)
+            .order_by("taken_at")
+        )
 
         serializer = self.get_serializer(logs, many=True)
         return Response(serializer.data)
+
 
 class NoteViewSet(viewsets.ModelViewSet):
     """
@@ -195,18 +205,21 @@ class NoteViewSet(viewsets.ModelViewSet):
     Endpoint base path:
         /api/notes/
     """
+
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
 
     filter_backends = [SearchFilter]
-    search_fields = ['medication__name']
+    search_fields = ["medication__name"]
 
     def update(self, request, *args, **kwargs):
-        return Response({"detail": "Updating notes is not allowed."},
-                        status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        return Response(
+            {"detail": "Updating notes is not allowed."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
 
     def partial_update(self, request, *args, **kwargs):
-        return Response({"detail": "Updating notes is not allowed."},
-                        status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
+        return Response(
+            {"detail": "Updating notes is not allowed."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )

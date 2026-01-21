@@ -16,7 +16,7 @@ class NotesAPITests(APITestCase):
     def test_create_note_success(self):
         payload = {
             "medication": self.med.id,
-            "text": "Patient reported mild side effects."
+            "text": "Patient reported mild side effects.",
         }
         response = self.client.post(self.notes_url, payload, format="json")
 

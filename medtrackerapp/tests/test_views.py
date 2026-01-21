@@ -9,12 +9,9 @@ from datetime import timedelta
 
 
 class MedicationViewTests(APITestCase):
-
     def setUp(self):
         self.med = Medication.objects.create(
-            name="Aspirin",
-            dosage_mg=100,
-            prescribed_per_day=2
+            name="Aspirin", dosage_mg=100, prescribed_per_day=2
         )
 
     # List
@@ -31,21 +28,13 @@ class MedicationViewTests(APITestCase):
     # Create
     def test_create_medication(self):
         url = reverse("medication-list")
-        payload = {
-            "name": "Ibuprofen",
-            "dosage_mg": 200,
-            "prescribed_per_day": 1
-        }
+        payload = {"name": "Ibuprofen", "dosage_mg": 200, "prescribed_per_day": 1}
         response = self.client.post(url, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_create_medication_invalid(self):
         url = reverse("medication-list")
-        payload = {
-            "name": "",
-            "dosage_mg": -10,
-            "prescribed_per_day": 0
-        }
+        payload = {"name": "", "dosage_mg": -10, "prescribed_per_day": 0}
         response = self.client.post(url, payload)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -76,11 +65,16 @@ class MedicationViewTests(APITestCase):
 
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = {
-            "results": [{
-                "openfda": {"generic_name": ["Aspirin"], "manufacturer_name": ["Bayer"]},
-                "warnings": ["Warning text"],
-                "purpose": ["Pain relief"]
-            }]
+            "results": [
+                {
+                    "openfda": {
+                        "generic_name": ["Aspirin"],
+                        "manufacturer_name": ["Bayer"],
+                    },
+                    "warnings": ["Warning text"],
+                    "purpose": ["Pain relief"],
+                }
+            ]
         }
 
         response = self.client.get(url)
@@ -90,17 +84,12 @@ class MedicationViewTests(APITestCase):
 
 
 class DoseLogViewTests(APITestCase):
-
     def setUp(self):
         self.med = Medication.objects.create(
-            name="Aspirin",
-            dosage_mg=100,
-            prescribed_per_day=2
+            name="Aspirin", dosage_mg=100, prescribed_per_day=2
         )
         self.log = DoseLog.objects.create(
-            medication=self.med,
-            taken_at=timezone.now(),
-            was_taken=True
+            medication=self.med, taken_at=timezone.now(), was_taken=True
         )
 
     # List
@@ -115,7 +104,7 @@ class DoseLogViewTests(APITestCase):
         payload = {
             "medication": self.med.id,
             "taken_at": timezone.now().isoformat(),
-            "was_taken": True
+            "was_taken": True,
         }
         response = self.client.post(url, payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -125,7 +114,7 @@ class DoseLogViewTests(APITestCase):
         payload = {
             "medication": self.med.id,
             "taken_at": "invalid-date",
-            "was_taken": True
+            "was_taken": True,
         }
         response = self.client.post(url, payload)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -142,7 +131,7 @@ class DoseLogViewTests(APITestCase):
         payload = {
             "medication": self.med.id,
             "taken_at": timezone.now().isoformat(),
-            "was_taken": False
+            "was_taken": False,
         }
         response = self.client.put(url, payload)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
