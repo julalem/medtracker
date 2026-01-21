@@ -1,7 +1,8 @@
 openapi: 3.0.2
 info:
-  title: ''
-  version: ''
+  title: Software engineering lab
+  version: v1
+  description: API documentation for the lab
 paths:
   /api/medications/:
     get:
@@ -622,13 +623,11 @@ components:
           maxLength: 100
         dosage_mg:
           type: integer
-          maximum: 9223372036854775807
-          format: int64
+          maximum: 2147483647
           minimum: 0
         prescribed_per_day:
           type: integer
-          maximum: 9223372036854775807
-          format: int64
+          maximum: 2147483647
           description: Expected number of doses per day
           minimum: 0
         adherence:
