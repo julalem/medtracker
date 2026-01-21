@@ -11,10 +11,12 @@ class Medication(models.Model):
     Each Medication instance can have multiple associated DoseLog
     entries that record when doses were taken or missed.
     """
-        
+
     name = models.CharField(max_length=100)
     dosage_mg = models.PositiveIntegerField(default=0)
-    prescribed_per_day = models.PositiveIntegerField(help_text="Expected number of doses per day")
+    prescribed_per_day = models.PositiveIntegerField(
+        help_text="Expected number of doses per day"
+    )
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -77,8 +79,7 @@ class Medication(models.Model):
             raise ValueError("start_date must be before or equal to end_date")
 
         logs = self.doselog_set.filter(
-            taken_at__date__gte=start_date,
-            taken_at__date__lte=end_date
+            taken_at__date__gte=start_date, taken_at__date__lte=end_date
         )
         days = (end_date - start_date).days + 1
         expected = self.expected_doses(days)
@@ -114,13 +115,14 @@ class DoseLog(models.Model):
     Each DoseLog entry corresponds to a specific date/time when the
     medication was either taken or missed.
     """
-        
+
     medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
     taken_at = models.DateTimeField()
     was_taken = models.BooleanField(default=True)
 
     class Meta:
         """Metadata options for the DoseLog model."""
+
         ordering = ["-taken_at"]
 
     def __str__(self):
@@ -129,8 +131,12 @@ class DoseLog(models.Model):
         when = timezone.localtime(self.taken_at).strftime("%Y-%m-%d %H:%M")
         return f"{self.medication.name} at {when} - {status}"
 
+
 class Note(models.Model):
-        """Records the administration of a medication note."""
-        medication = models.ForeignKey(Medication, on_delete=models.CASCADE, related_name="notes")
-        text = models.TextField()
-        created_at = models.DateField(auto_now_add=True)
+    """Records the administration of a medication note."""
+
+    medication = models.ForeignKey(
+        Medication, on_delete=models.CASCADE, related_name="notes"
+    )
+    text = models.TextField()
+    created_at = models.DateField(auto_now_add=True)

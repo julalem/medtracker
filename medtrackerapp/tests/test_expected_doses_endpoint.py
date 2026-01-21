@@ -3,13 +3,11 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from medtrackerapp.models import Medication
 
-class ExpectedDosesAPITests(APITestCase):
 
+class ExpectedDosesAPITests(APITestCase):
     def setUp(self):
         self.med = Medication.objects.create(
-            name="TestMed",
-            dosage_mg=50,
-            prescribed_per_day=2
+            name="TestMed", dosage_mg=50, prescribed_per_day=2
         )
 
     def test_missing_days_parameter_returns_400(self):
@@ -31,8 +29,12 @@ class ExpectedDosesAPITests(APITestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_medication_with_zero_prescribed_per_day_raises_valueerror_from_model_returns_400(self):
-        med2 = Medication.objects.create(name="ZeroMed", dosage_mg=10, prescribed_per_day=0)
+    def test_medication_with_zero_prescribed_per_day_raises_valueerror_from_model_returns_400(
+        self,
+    ):
+        med2 = Medication.objects.create(
+            name="ZeroMed", dosage_mg=10, prescribed_per_day=0
+        )
         url = reverse("medication-expected-doses", args=[med2.id]) + "?days=1"
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)

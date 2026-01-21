@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('medtrackerapp', '0003_medication_description_alter_note_created_at'),
+        ("medtrackerapp", "0003_medication_description_alter_note_created_at"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='medication',
-            name='dosage_mg',
+            model_name="medication",
+            name="dosage_mg",
             field=models.PositiveIntegerField(default=0),
         ),
     ]

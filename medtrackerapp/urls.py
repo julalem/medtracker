@@ -25,9 +25,8 @@ router.register(r"notes", NoteViewSet, basename="note")
 urlpatterns = [
     path("", include(router.urls)),
     path(
-    "swagger/",
-    schema_view.with_ui("swagger", cache_timeout=0),
-    name="schema-swagger-ui",
-),
-
+        "swagger/",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
 ]
