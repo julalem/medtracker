@@ -1,4 +1,4 @@
-\name: OpenAPI docs check
+name: OpenAPI docs check
 
 on:
   push:
