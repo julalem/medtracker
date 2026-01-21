@@ -1,5 +1,21 @@
-<<<<<<< HEAD
-.env
-=======
+
+# IDE
 .idea/
->>>>>>> b28c5e5 (chore: remove IDE files from repo)
+.vscode/
+
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Django
+*.log
+db.sqlite3
+.coverage
+
+# Virtual environments
+venv/
+.venv/
+myenv/
